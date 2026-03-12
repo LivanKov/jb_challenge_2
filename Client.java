@@ -1,6 +1,7 @@
 import java.net.ConnectException;
 
 public class Client {
+
     public static void main(String[] args) {
         var server = new ServerInstance();
         try {
