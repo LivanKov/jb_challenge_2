@@ -1,0 +1,3 @@
+- Dependencies
+    - Java 11 or higher
+    - Docker (for running the webserver instance)
