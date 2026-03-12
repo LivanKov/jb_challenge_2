@@ -15,11 +15,11 @@ public class ServerInstance {
     public byte[] getFile(String fileName) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(ServerInstance.ADDRESS + fileName))
-            .header("Accept", "application/json")
-            .GET()
+            .HEAD()
             .build();
-        HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body().getBytes();  
+        HttpResponse<byte[]> response = this.client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        System.out.println("Content-Length: " + Long.valueOf(response.headers().firstValue("Content-Length").get()));
+        return response.body();
     }
 
 }
