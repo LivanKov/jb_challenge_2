@@ -4,27 +4,17 @@ import java.net.http.HttpResponse;
 import java.net.URI;
 
 public class ServerInstance {
-    private String name;
-    private String address;
     private HttpClient client;
 
-    public ServerInstance(String name, String address) {
-        this.name = name;
-        this.address = address;
+    public static final String ADDRESS = "http://localhost:8080/";
+
+    public ServerInstance() {
         this.client = HttpClient.newHttpClient();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getAddress() {
-        return address;
     }
 
     public byte[] getFile(String fileName) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8080/" + fileName))
+            .uri(URI.create(ServerInstance.ADDRESS + fileName))
             .header("Accept", "application/json")
             .GET()
             .build();
