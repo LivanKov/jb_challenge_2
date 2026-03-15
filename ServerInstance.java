@@ -18,9 +18,6 @@ public class ServerInstance {
             .GET()
             .build();
         HttpResponse<byte[]> response = this.client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        long contentLength = Long.valueOf(response.headers().firstValue("Content-Length").get());
-        System.out.println("Content-Length: " + contentLength);
-        System.out.println("Accept ranges: " + response.headers().firstValue("Accept-Ranges").get());   
         return response.body();
     }
 
@@ -31,9 +28,6 @@ public class ServerInstance {
             .GET()
             .build();
         HttpResponse<byte[]> response = this.client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        long contentLength = Long.valueOf(response.headers().firstValue("Content-Length").get());
-        System.out.println("Content-Length: " + contentLength);
-        System.out.println("Accept ranges: " + response.headers().firstValue("Accept-Ranges").get());   
         return response.body();
     }
 
