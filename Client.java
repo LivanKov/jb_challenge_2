@@ -30,11 +30,7 @@ public class Client {
             int end = start + chunkSize - 1;
             int chunkIndex = i;
             threads[i] = new Thread(() -> {
-                try {
-                    chunks[chunkIndex] = server.getFile(fileName, start, end);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                chunks[chunkIndex] = getFile(server, fileName, start, end);
             });
             threads[i].start();
             from = end + 1;
@@ -59,28 +55,38 @@ public class Client {
         return reconstructedFile;
     }
 
-    public static void getFile(ServerInstance server, String fileName) {
+    public static byte[] getFile(ServerInstance server, String fileName) {
         try {
             byte[] fileBytes = server.getFile(fileName);
             System.out.println("File content as bytes: " + new String(fileBytes));
+            return fileBytes;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 
-    public static void getFile(ServerInstance server, String fileName, int from, int to) {
+    public static byte[] getFile(ServerInstance server, String fileName, int from, int to) {
         try {
             byte[] fileBytes = server.getFile(fileName, from, to);
             System.out.println("File content as bytes: " + new String(fileBytes));
+            return fileBytes;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
+    }
+
+    public static boolean validateFileContent(String fileName, byte[] fetchedContent) {
+        byte[] expectedBytes = getFile(new ServerInstance(), fileName);
+        return java.util.Arrays.equals(fetchedContent, expectedBytes);
     }
 
 
     public static void main(String[] args) {
         var server = new ServerInstance();
         byte[] fileBytes = Client.getFileConcurrent(server, "big_json.json", 4);
-        System.out.println("File content as bytes: " + new String(fileBytes));
+        boolean isValid = validateFileContent("big_json.json", fileBytes);
+        System.out.println("File content validation result: " + isValid);
     }
 }

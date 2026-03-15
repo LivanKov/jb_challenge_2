@@ -5,16 +5,22 @@ import java.net.URI;
 
 public class ServerInstance {
     private HttpClient client;
+    private String address;
 
     public static final String ADDRESS = "http://localhost:8080/";
 
     public ServerInstance() {
-        this.client = HttpClient.newHttpClient();
+        this(HttpClient.newHttpClient(), ADDRESS);
+    }
+
+    public ServerInstance(HttpClient client, String address) {
+        this.client = client;
+        this.address = address;
     }
 
     public byte[] getFile(String fileName) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(ServerInstance.ADDRESS + fileName))
+            .uri(URI.create(this.address + fileName))
             .GET()
             .build();
         HttpResponse<byte[]> response = this.client.send(request, HttpResponse.BodyHandlers.ofByteArray());
@@ -23,7 +29,7 @@ public class ServerInstance {
 
     public byte[] getFile(String fileName, int from, int to) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(ServerInstance.ADDRESS + fileName))
+            .uri(URI.create(this.address + fileName))
             .header("Range", "bytes=" + from + "-" + to)
             .GET()
             .build();
@@ -33,7 +39,7 @@ public class ServerInstance {
 
     public String[] fetchHeaders(String fileName) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(ServerInstance.ADDRESS + fileName))
+            .uri(URI.create(this.address + fileName))
             .HEAD()
             .build();
         HttpResponse<Void> response = this.client.send(request, HttpResponse.BodyHandlers.discarding());
