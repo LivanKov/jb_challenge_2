@@ -3,10 +3,7 @@ public class Client {
 
     public static String[] getFileHeaders(ServerInstance server, String fileName) {
         try {
-            String[] headers = server.fetchHeaders(fileName);
-            System.out.println("Content-Length: " + headers[0]);
-            System.out.println("Accept-Ranges: " + headers[1]);
-            return headers;
+            return server.fetchHeaders(fileName);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -57,9 +54,7 @@ public class Client {
 
     public static byte[] getFile(ServerInstance server, String fileName) {
         try {
-            byte[] fileBytes = server.getFile(fileName);
-            System.out.println("File content as bytes: " + new String(fileBytes));
-            return fileBytes;
+            return server.getFile(fileName);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -68,9 +63,7 @@ public class Client {
 
     public static byte[] getFile(ServerInstance server, String fileName, int from, int to) {
         try {
-            byte[] fileBytes = server.getFile(fileName, from, to);
-            System.out.println("File content as bytes: " + new String(fileBytes));
-            return fileBytes;
+            return server.getFile(fileName, from, to);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -85,8 +78,25 @@ public class Client {
 
     public static void main(String[] args) {
         var server = new ServerInstance();
-        byte[] fileBytes = Client.getFileConcurrent(server, "big_json.json", 4);
-        boolean isValid = validateFileContent("big_json.json", fileBytes);
-        System.out.println("File content validation result: " + isValid);
+        String fileName = "big_json.json";
+        int threadCount = 4;
+
+        long sequentialStart = System.nanoTime();
+        byte[] sequentialBytes = Client.getFile(server, fileName);
+        long sequentialDuration = System.nanoTime() - sequentialStart;
+
+        long concurrentStart = System.nanoTime();
+        byte[] concurrentBytes = Client.getFileConcurrent(server, fileName, threadCount);
+        long concurrentDuration = System.nanoTime() - concurrentStart;
+
+        boolean isValid = java.util.Arrays.equals(sequentialBytes, concurrentBytes);
+        double sequentialMillis = sequentialDuration / 1_000_000.0;
+        double concurrentMillis = concurrentDuration / 1_000_000.0;
+        double speedup = (double) sequentialDuration / concurrentDuration;
+
+        System.out.println("Sequential fetch time: " + sequentialMillis + " ms");
+        System.out.println("Concurrent fetch time (" + threadCount + " threads): " + concurrentMillis + " ms");
+        System.out.println("Concurrent result matches sequential result: " + isValid);
+        System.out.println("Speedup: " + speedup + "x");
     }
 }
